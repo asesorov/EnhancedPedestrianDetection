@@ -1,3 +1,4 @@
+albumentations
 torch
 torchaudio
 torchvision
