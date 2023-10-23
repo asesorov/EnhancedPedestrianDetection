@@ -1,0 +1,14 @@
+stages:
+  augment_train_data:
+    cmd: python augment_data.py -i nightowls_data/train/images
+    deps:
+      - augment_data.py
+      - nightowls_data/train/images
+
+  augment_val_data:
+    cmd: python augment_data.py -i nightowls_data/val/images
+    deps:
+      - augment_data.py
+      - nightowls_data/val/images
+ 
+
