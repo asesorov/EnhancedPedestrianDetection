@@ -1,0 +1,28 @@
+{
+    "detection": {
+        "yolov8n": {
+            "pytorch": {
+                "weights": "I:\\itmo\\cv\\EnhancedPedestrianDetection\\src\\weights\\yolov8\\detection\\pytorch\\best.pt"
+            },
+            "onnx": {
+                "weights": "I:\\itmo\\cv\\EnhancedPedestrianDetection\\src\\weights\\yolov8\\detection\\onnx\\best.onnx"
+            },
+            "ncnn": {
+                "model_dir": "I:\\itmo\\cv\\EnhancedPedestrianDetection\\src\\weights\\yolov8\\detection\\NCNN"
+            }
+        }
+    },
+    "segmentation": {
+        "yolov8n": {
+            "pytorch": {
+                "weights": "I:\\itmo\\cv\\EnhancedPedestrianDetection\\src\\weights\\yolov8\\detection\\pytorch\\best.pt"
+            },
+            "onnx": {
+                "weights": "I:\\itmo\\cv\\EnhancedPedestrianDetection\\src\\weights\\yolov8\\detection\\onnx\\best.onnx"
+            },
+            "ncnn": {
+                "model_dir": "I:\\itmo\\cv\\EnhancedPedestrianDetection\\src\\weights\\yolov8\\detection\\NCNN"
+            }
+        }
+    }
+}
