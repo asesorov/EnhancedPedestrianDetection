@@ -1,0 +1,85 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+        "detection": {
+            "type": "object",
+            "properties": {
+                "yolov8n": {
+                    "type": "object",
+                    "properties": {
+                        "pytorch": {
+                            "type": "object",
+                            "properties": {
+                                "weights": {
+                                    "type": "string"
+                                }
+                            },
+                            "required": ["weights"]
+                        },
+                        "onnx": {
+                            "type": "object",
+                            "properties": {
+                                "weights": {
+                                    "type": "string"
+                                }
+                            },
+                            "required": ["weights"]
+                        },
+                        "ncnn": {
+                            "type": "object",
+                            "properties": {
+                                "model_dir": {
+                                    "type": "string"
+                                }
+                            },
+                            "required": ["model_dir"]
+                        }
+                    },
+                    "required": ["pytorch", "onnx", "ncnn"]
+                }
+            },
+            "required": ["yolov8n"]
+        },
+        "segmentation": {
+            "type": "object",
+            "properties": {
+                "yolov8n": {
+                    "type": "object",
+                    "properties": {
+                        "pytorch": {
+                            "type": "object",
+                            "properties": {
+                                "weights": {
+                                    "type": "string"
+                                }
+                            },
+                            "required": ["weights"]
+                        },
+                        "onnx": {
+                            "type": "object",
+                            "properties": {
+                                "weights": {
+                                    "type": "string"
+                                }
+                            },
+                            "required": ["weights"]
+                        },
+                        "ncnn": {
+                            "type": "object",
+                            "properties": {
+                                "model_dir": {
+                                    "type": "string"
+                                }
+                            },
+                            "required": ["model_dir"]
+                        }
+                    },
+                    "required": ["pytorch", "onnx", "ncnn"]
+                }
+            },
+            "required": ["yolov8n"]
+        }
+    },
+    "required": ["detection", "segmentation"]
+}
