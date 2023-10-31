@@ -1,0 +1,15 @@
+description: Ultralytics YOLOv8nano_6e_nightowls_best model trained on E:\nightowls_validation\data.yaml
+author: Ultralytics
+license: AGPL-3.0 https://ultralytics.com/license
+date: '2023-10-25T17:48:00.078429'
+version: 8.0.196
+stride: 32
+task: detect
+batch: 1
+imgsz:
+- 640
+- 640
+names:
+  0: pedestrian
+  1: bicycledriver
+  2: motorbikedriver

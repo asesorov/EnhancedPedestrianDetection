@@ -1,7 +1,10 @@
 import sys
+import logging as log
 from pathlib import Path
 
 import cv2
+import numpy as np
+#from ultralytics.yolo.utils.ops import scale_image
 
 from models.yolo_ncnn import YoloNCNN
 
@@ -10,13 +13,32 @@ from models_configs.model_configurator import ModelConfig
 from logger_conf import configure_logger
 
 
-log = configure_logger()
+configure_logger()
+ROOT_DIR = Path(__file__).resolve().parents[2]
+
+log.info('[NCNN] Setting up models config')
 MODEL_CONF = ModelConfig()
-NCNN_MODEL_DET = YoloNCNN(MODEL_CONF.properties['detection']['yolov8n']['ncnn']['model_dir'])
+
+DETECT_MODEL_WEIGHTS = ROOT_DIR / MODEL_CONF.properties['detection']['yolov8n']['ncnn']['model_dir']
+log.info(f'[NCNN] Loading detection model: {DETECT_MODEL_WEIGHTS}')
+NCNN_MODEL_DET = YoloNCNN(DETECT_MODEL_WEIGHTS, 'detect')
+
+SEGMENT_MODEL_WEIGHTS = ROOT_DIR / MODEL_CONF.properties['segmentation']['yolov8n']['ncnn']['model_dir']
+log.info(f'[NCNN] Loading segmentation model: {SEGMENT_MODEL_WEIGHTS}')
+NCNN_MODEL_SEG = YoloNCNN(SEGMENT_MODEL_WEIGHTS, 'segment')
 
 
-def get_bounding_boxes(input, raw_output=False):
-    log.indo('Inference: detection')
+def detect_get_bounding_boxes(input, raw_output=False):
+    """
+    Performs NCNN inference on input. Can return raw boxes coodrinates
+    (use raw_output flag) or rectangles as bounding boxes.
+    Params:
+        input: image. np.ndarray
+    Returns:
+        input_image: The combined image. np.ndarray
+    """
+
+    log.info('Inference: detection')
     results = NCNN_MODEL_DET.simple_predict(input)
     out_boxes = []
     rects = []
@@ -33,9 +55,70 @@ def get_bounding_boxes(input, raw_output=False):
 
     return rects
 
-def draw_boxes(input_image):
-    log.indo('Drawing bounding boxes')
-    rects = get_bounding_boxes(input_image)
+def detect_draw_boxes(input_image):
+    """
+    Combines image and its detected bounding boxes into a single image.
+    Params:
+        input_image: image. np.ndarray
+    Returns:
+        input_image: The combined image. np.ndarray
+    """
+    log.info('Drawing bounding boxes')
+    rects = detect_get_bounding_boxes(input_image)
     for r in rects:
         cv2.rectangle(input_image, r[:2], r[2:], (255, 255, 255), 2)
     return input_image
+
+
+def segment_predict_on_image(img, conf):
+    result = NCNN_MODEL_SEG.simple_predict(img, conf=conf)[0]
+
+    # segmentation
+    print(result)
+    masks = result.masks.cpu().numpy()     # masks, (N, H, W)
+    #masks = np.moveaxis(masks, 0, -1) # masks, (H, W, N)
+    # rescale masks to original image
+    #masks = scale_image(masks.shape[:2], masks, result.masks.orig_shape)
+    #masks = np.moveaxis(masks, -1, 0) # masks, (N, H, W)
+
+    return masks
+
+
+def segment_draw_overlay(image, color=(0,255,0), alpha=0.3, resize=None):
+    """
+    Combines image and its segmentation mask into a single image.
+
+    Params:
+        image: image. np.ndarray,
+        mask: Segmentation mask. np.ndarray,
+        color: Color for segmentation mask rendering.  tuple[int, int, int] = (255, 0, 0)
+        alpha: Segmentation mask's transparency. float = 0.5,
+        resize: If provided, both image and its mask are resized before blending them together.
+        tuple[int, int] = (1024, 1024))
+
+    Returns:
+        image_combined: The combined image. np.ndarray
+
+    """
+
+    masks = segment_predict_on_image(image, conf=0.55)
+
+    color = color[::-1]
+
+    for mask in masks:
+        colored_mask = np.expand_dims(mask, 0).repeat(3, axis=0)
+        colored_mask = np.moveaxis(colored_mask, 0, -1)
+        masked = np.ma.MaskedArray(image, mask=colored_mask, fill_value=color)
+        image_overlay = masked.filled()
+
+        if resize is not None:
+            image = cv2.resize(image.transpose(1, 2, 0), resize)
+            image_overlay = cv2.resize(image_overlay.transpose(1, 2, 0), resize)
+
+        image = cv2.addWeighted(image, 1 - alpha, image_overlay, alpha, 0)
+
+    return image
+
+
+cv2.imwrite('tesfromrepo_det.png', detect_draw_boxes(cv2.imread('/home/asesorov/itmo/ncnn-py/night_ped_0.png')))
+cv2.imwrite('tesfromrepo_seg.png', segment_draw_overlay(cv2.imread('/home/asesorov/itmo/ncnn-py/night_ped_0.png')))
