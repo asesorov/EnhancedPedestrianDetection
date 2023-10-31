@@ -1,39 +1,69 @@
-"""
-Logger configuration module
-"""
-
+import os
 import sys
+import traceback
 import time
-import logging
+import logging as log
 
-from pathlib import Path
-
-LOG_PATH = Path(__file__).resolve().parent.parent / "logs"
-FORMATTER = logging.Formatter("[%(asctime)s] [%(thread)d] %(name)s %(levelname)s: %(message)s")
+DEFAULT_FORMATTER = log.Formatter('[ %(levelname)s ] %(message)s')
 
 
-def configure_logger(name=None):
+class ColorFormatter(log.Formatter):
+
+    grey = '\x1b[38;20m'
+    yellow = '\x1b[33;20m'
+    red = '\x1b[31;20m'
+    bold_red = '\x1b[31;1m'
+    reset = '\x1b[0m'
+    custom_format = '[ %(levelname)s ] %(message)s'
+
+    FORMATS = {
+        log.DEBUG: grey + custom_format + reset,
+        log.WARNING: yellow + custom_format + reset,
+        log.ERROR: red + custom_format + reset,
+        log.CRITICAL: bold_red + custom_format + reset,
+    }
+
+    def format(self, record):   # noqa
+        log_fmt = self.FORMATS.get(record.levelno)
+        formatter = log.Formatter(log_fmt)
+        return formatter.format(record)
+
+
+def exception_hook(exc_type, message, stack):   # noqa
     """
-    Prepare logger
-    :return: logger
+    Allows capturing uncaught exceptions to the log file.
+    Usage: define sys.excepthook = exception_hook
+    Warning: works only for the main thread.
     """
+    log.error(f'Uncaught exception: {exc_type.__name__}: {message}.\nTraceback:\n'
+              f'{"".join(traceback.format_tb(stack))}')
 
-    logger = logging.getLogger(name)
-    logger.setLevel(logging.DEBUG)
-    log_time = time.strftime("%d%m_%I%M%S")
 
-    stream_handler = logging.StreamHandler(stream=sys.stdout)
-    stream_handler.setLevel(logging.DEBUG)
-    stream_handler.setFormatter(FORMATTER)
+def configure_logger(name='', level=log.INFO, use_default_formatter=False):
+    """
+    Modifies logging: allows writing to log file with colored messages
+    Usage: import logging, call configure_logger(), use logging as is
+    :param name: logfile name (file format: <name>_<time>.log)
+    :param level: logging level
+    :param use_default_formatter: mark True to disable colored output
+    :return:
+    """
+    log_time = time.strftime('%d%m_%I%M%S')
+    log_path = os.path.join('logs', f'{name}_{log_time}.log')
+    formatter = DEFAULT_FORMATTER if use_default_formatter else ColorFormatter()
+    if not os.path.exists('logs'):
+        os.makedirs('logs')
 
-    file_handler = logging.FileHandler(f"{LOG_PATH}\\{name.replace('.', '-')}_{log_time}.log")
-    file_handler.setLevel(logging.DEBUG)
-    file_handler.setFormatter(FORMATTER)
+    stream_handler = log.StreamHandler(stream=sys.stdout)
+    stream_handler.setLevel(level)
+    stream_handler.setFormatter(formatter)
 
-    # noinspection PyArgumentList
-    logging.basicConfig(
-        level=logging.INFO,
+    file_handler = log.FileHandler(log_path)
+    file_handler.setLevel(level)
+    file_handler.setFormatter(formatter)
+
+    log.basicConfig(
+        level=level,
         datefmt='%d/%m/%Y %I:%M:%S %p',
-        handlers=[stream_handler, file_handler]
+        handlers=[stream_handler, file_handler],
     )
-    return logger
