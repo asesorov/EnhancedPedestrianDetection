@@ -74,12 +74,7 @@ def segment_predict_on_image(img, conf):
     result = NCNN_MODEL_SEG.simple_predict(img, conf=conf)[0]
 
     # segmentation
-    print(result)
-    masks = result.masks.cpu().numpy()     # masks, (N, H, W)
-    #masks = np.moveaxis(masks, 0, -1) # masks, (H, W, N)
-    # rescale masks to original image
-    #masks = scale_image(masks.shape[:2], masks, result.masks.orig_shape)
-    #masks = np.moveaxis(masks, -1, 0) # masks, (N, H, W)
+    masks = result.masks.data.cpu().numpy()
 
     return masks
 
@@ -102,10 +97,10 @@ def segment_draw_overlay(image, color=(0,255,0), alpha=0.3, resize=None):
     """
 
     masks = segment_predict_on_image(image, conf=0.55)
-
-    color = color[::-1]
+    h, w, _ = image.shape
 
     for mask in masks:
+        mask = cv2.resize(mask, (w, h))
         colored_mask = np.expand_dims(mask, 0).repeat(3, axis=0)
         colored_mask = np.moveaxis(colored_mask, 0, -1)
         masked = np.ma.MaskedArray(image, mask=colored_mask, fill_value=color)
