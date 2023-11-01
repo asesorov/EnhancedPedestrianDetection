@@ -1,0 +1,12 @@
+version: "3.9"
+
+services:
+  web:
+    build: .
+    restart: unless-stopped
+    command: streamlit run app.py --server.port=8501 --server.address=0.0.0.0
+    volumes:
+      - .:/src
+    ports:
+      - "8501:8501"
+
