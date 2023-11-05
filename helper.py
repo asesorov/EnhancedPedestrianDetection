@@ -33,7 +33,8 @@ def display_tracker_options():
 
 
 def _display_detected_frames(conf, st_frame, image, is_display_tracking=None, tracker=None,
-                             model_detection=None, model_segmentation=None, include_logic=False):
+                             model_detection=None, model_segmentation=None, include_logic=False,
+                             plot_segmentation=True):
     """
     Display the detected objects on a video frame using the YOLOv8 model.
 
@@ -72,7 +73,7 @@ def _display_detected_frames(conf, st_frame, image, is_display_tracking=None, tr
     else:
         boxes = []
 
-    if res_segmentation:
+    if res_segmentation and plot_segmentation:
         segmentation_mask = get_resized_mask(res_segmentation)
         segmentation_mask = merge_masks(segmentation_mask)
         if not res_segmentation[0].masks:

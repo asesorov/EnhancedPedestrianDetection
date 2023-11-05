@@ -31,9 +31,11 @@ model_segmentation_path = None
 model_detection = None
 model_segmentation = None
 include_logic = False
+plot_segmentation = True
 
 if "Detection" in model_types and "Segmentation" in model_types:
     include_logic = st.sidebar.checkbox(label="Include logic")
+    plot_segmentation = st.sidebar.checkbox(label="Plot segmentation")
 
 confidence = float(st.sidebar.slider(
     "Select Model Confidence", 10, 100, 35)) / 100
@@ -82,4 +84,4 @@ else:
 
 if helper_func:
     helper_func(confidence, model_detection=model_detection,
-                model_segmentation=model_segmentation, include_logic=include_logic)
+                model_segmentation=model_segmentation, include_logic=include_logic, plot_segmentation=plot_segmentation)
