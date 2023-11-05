@@ -7,6 +7,7 @@ import settings
 import numpy as np
 from ultralytics.utils.ops import scale_image
 import math
+import io
 
 
 def load_model(model_path):
@@ -238,20 +239,29 @@ def play_stored_video(*args, **kwargs):
     Raises:
         None
     """
-    source_vid = st.sidebar.selectbox(
-        "Choose a video...", settings.VIDEOS_DICT.keys())
+    # source_vid = st.sidebar.selectbox(
+    #     "Choose a video...", settings.VIDEOS_DICT.keys())
+    uploaded_file = st.file_uploader("Choose a video...", type=["mp4", "avi"])
+    if uploaded_file:
+        video_bytes = io.BytesIO(uploaded_file.read())
+        temporary_location = "videos/video"
+
+        with open(temporary_location, 'wb') as out:
+            out.write(video_bytes.read())
+
+        out.close()
 
     is_display_tracker, tracker = display_tracker_options()
 
-    with open(settings.VIDEOS_DICT.get(source_vid), 'rb') as video_file:
-        video_bytes = video_file.read()
-    if video_bytes:
+    if uploaded_file and video_bytes:
         st.video(video_bytes)
+
+    # with open(settings.VIDEOS_DICT.get(source_vid), 'rb') as video_file:
+    #     video_bytes = video_file.read()
 
     if st.sidebar.button('Detect Video Objects'):
         try:
-            vid_cap = cv2.VideoCapture(
-                str(settings.VIDEOS_DICT.get(source_vid)))
+            vid_cap = cv2.VideoCapture(temporary_location)
             st_frame = st.empty()
             count = 0
             while vid_cap.isOpened():
