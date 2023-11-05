@@ -28,7 +28,11 @@ model_type = st.sidebar.radio(
     "Select Task", ['Detection', 'Segmentation'])
 
 confidence = float(st.sidebar.slider(
-    "Select Model Confidence", 25, 100, 40)) / 100
+    "Select Model Confidence", 10, 100, 40)) / 100
+
+st.sidebar.header("Video Config")
+source_radio = st.sidebar.radio(
+    "Select Source", settings.SOURCES_LIST)
 
 # Selecting Detection Or Segmentation
 if model_type == 'Detection':
@@ -43,9 +47,6 @@ except Exception as ex:
     st.error(f"Unable to load model. Check the specified path: {model_path}")
     st.error(ex)
 
-st.sidebar.header("Video Config")
-source_radio = st.sidebar.radio(
-    "Select Source", settings.SOURCES_LIST)
 
 if source_radio == settings.VIDEO:
     helper.play_stored_video(confidence, model)

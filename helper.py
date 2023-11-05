@@ -5,6 +5,7 @@ import cv2
 from pytube import YouTube
 
 import settings
+import math
 
 
 def load_model(model_path):
@@ -22,8 +23,8 @@ def load_model(model_path):
 
 
 def display_tracker_options():
-    display_tracker = st.radio("Display Tracker", ('Yes', 'No'))
-    is_display_tracker = True if display_tracker == 'Yes' else False
+    display_tracker = st.checkbox(label="Tracker??")
+    is_display_tracker = True if display_tracker == True else False
     if is_display_tracker:
         tracker_type = st.radio("Tracker", ("bytetrack.yaml", "botsort.yaml"))
         return is_display_tracker, tracker_type
@@ -62,6 +63,7 @@ def _display_detected_frames(conf, model, st_frame, image, is_display_tracking=N
                    channels="BGR",
                    use_column_width=True
                    )
+    return res_plotted
 
 
 def play_youtube_video(conf, model):
@@ -214,18 +216,54 @@ def play_stored_video(conf, model):
             vid_cap = cv2.VideoCapture(
                 str(settings.VIDEOS_DICT.get(source_vid)))
             st_frame = st.empty()
+            count = 0
             while (vid_cap.isOpened()):
+                count += 1
                 success, image = vid_cap.read()
                 if success:
-                    _display_detected_frames(conf,
+                    res = _display_detected_frames(conf,
                                              model,
                                              st_frame,
                                              image,
                                              is_display_tracker,
                                              tracker
                                              )
+                    count_str = "0" * (4 - len(str(count))) + str(count)
+                    cv2.imwrite(f'processed_images/color_img_{count_str}.png', res)
                 else:
                     vid_cap.release()
                     break
         except Exception as e:
             st.sidebar.error("Error loading video: " + str(e))
+
+
+def dist_alert(bbox_pesh_pred, seg_road_pred,threshold):
+    #тут вопрос -- как будут отображаться в ббоксе несколько пешеходов (не успею найти нужный пример), сейчас для одного (на mvp)
+    for crd in bbox_pesh_pred:
+        bbox_coord = crd.boxes.xyxy[0]
+
+    pesh_x = (bbox_coord[2] + bbox_coord[0]) / 2 #середина нижнего по х
+    pesh_y = bbox_coord[3] #высота нижнего по y
+
+    #если надо нормировать координаты (не совсем согласен с такой идеей, потому что не отталкиваемся от высоты и ширины - она же может варьроваться от исходника) то поделить соотв координаты
+    bboxes, classes, segmentations, scores = seg_road_pred
+    for bbox, class_id, road_seg, score in zip(bboxes, classes, segmentations, scores):
+        #достаем массив координат сегмента
+        road_seg = road_seg
+
+    #массив расстояний до сегмента
+    dist_list = []
+    for x,y in [road_seg]:
+        dist_list.append(math.sqrt((pesh_x - x) ** 2 + (pesh_y - y) ** 2))
+
+    # минимальное расстояние до сегмента
+    min_dist = min(dist_list)
+
+    #проверка : если находится на дороге
+    if ( pesh_x >= min(road_seg[0]) & pesh_x <= max(road_seg[0]) ) & ( (pesh_y >= min(road_seg[1]) & pesh_y <= max(road_seg[1])) ):
+        return ('alert', min_dist)
+    #проверка : если расстояние до ближайшего сегмента меньше порога
+    elif min_dist < threshold:
+        return ('alert', min_dist)
+    else:
+        return min_dist
