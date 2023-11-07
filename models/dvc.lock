@@ -1,0 +1,26 @@
+schema: '2.0'
+stages:
+  augment_train_data:
+    cmd: python augment_data.py -i nightowls_data/train/images
+    deps:
+    - path: augment_data.py
+      hash: md5
+      md5: 6bfd4aad61abc76284350bd0e38b6a7c
+      size: 1004
+    - path: nightowls_data/train/images
+      hash: md5
+      md5: ca3b14e139289dd61c48933abb5f6f76.dir
+      size: 3798160704
+      nfiles: 3000
+  augment_val_data:
+    cmd: python augment_data.py -i nightowls_data/val/images
+    deps:
+    - path: augment_data.py
+      hash: md5
+      md5: 6bfd4aad61abc76284350bd0e38b6a7c
+      size: 1004
+    - path: nightowls_data/val/images
+      hash: md5
+      md5: 2f1b2ee2f735d50e447473fea04f643c.dir
+      size: 2533285336
+      nfiles: 2000

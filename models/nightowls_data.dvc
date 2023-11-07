@@ -1,0 +1,6 @@
+outs:
+- md5: 87d21a3225fe9a686e36b2e62d99aba6.dir
+  size: 6331507075
+  nfiles: 10004
+  hash: md5
+  path: nightowls_data
