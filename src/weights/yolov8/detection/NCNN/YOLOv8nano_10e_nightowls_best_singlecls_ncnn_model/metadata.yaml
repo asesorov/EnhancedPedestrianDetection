@@ -1,0 +1,16 @@
+description: Ultralytics YOLOv8nano_10e_nightowls_best_singlecls model trained on
+  I:\itmo\cv\datasets\nightowls_v\data.yaml
+author: Ultralytics
+license: AGPL-3.0 https://ultralytics.com/license
+date: '2023-11-01T19:23:43.701023'
+version: 8.0.196
+stride: 32
+task: detect
+batch: 1
+imgsz:
+- 640
+- 640
+names:
+  0: person
+  1: bicycledriver
+  2: motorbikedriver
