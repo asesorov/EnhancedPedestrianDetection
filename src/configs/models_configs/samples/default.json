@@ -8,7 +8,7 @@
                 "weights": "src/weights/yolov8/detection/onnx/best.onnx"
             },
             "ncnn": {
-                "model_dir": "src/weights/yolov8/detection/NCNN/YOLOv8nano_6e_nightowls_best_ncnn_model"
+                "model_dir": "src/weights/yolov8/detection/NCNN/YOLOv8nano_10e_nightowls_best_singlecls_ncnn_model"
             }
         }
     },
