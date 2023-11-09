@@ -212,9 +212,6 @@ def play_stored_video(*args, **kwargs):
 
         out.close()
 
-    if uploaded_file and video_bytes:
-        st.video(video_bytes)
-
     # with open(settings.VIDEOS_DICT.get(source_vid), 'rb') as video_file:
     #     video_bytes = video_file.read()
 
