@@ -6,7 +6,7 @@ import cv2
 import numpy as np
 #from ultralytics.yolo.utils.ops import scale_image
 
-from models.yolo_ncnn import YoloNCNN
+from .models.yolo_ncnn import YoloNCNN
 
 sys.path.append(str(Path(__file__).resolve().parents[1].joinpath('configs')))
 from models_configs.model_configurator import ModelConfig
@@ -73,6 +73,9 @@ def detect_draw_boxes(input_image):
 def segment_predict_on_image(img, conf):
     result = NCNN_MODEL_SEG.simple_predict(img, conf=conf)[0]
 
+    if result.masks is None:
+        return None
+
     # segmentation
     masks = result.masks.data.cpu().numpy()
 
@@ -113,7 +116,3 @@ def segment_draw_overlay(image, color=(0,255,0), alpha=0.3, resize=None):
         image = cv2.addWeighted(image, 1 - alpha, image_overlay, alpha, 0)
 
     return image
-
-
-cv2.imwrite('tesfromrepo_det.png', detect_draw_boxes(cv2.imread('/home/asesorov/itmo/ncnn-py/night_ped_0.png')))
-cv2.imwrite('tesfromrepo_seg.png', segment_draw_overlay(cv2.imread('/home/asesorov/itmo/ncnn-py/night_ped_0.png')))
