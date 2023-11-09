@@ -17,6 +17,13 @@
 
 Итак, проект по распознаванию пешеходов на дороге в темное время суток обладает значительным бизнес-потенциалом, предлагая ряд преимуществ, связанных с безопасностью, репутацией  и удовлетворением клиентов, а также социальными и общественными выгодами.
 
+## Диаграммы
+### Структура пайплайна
+![Use case](./samples/pipeline.png)
+
+### Диаграмма вариантов использования
+![Use case](./samples/use_case.png)
+
 ## Сравнение инференса
 Устройство: Raspberry Pi 4B (8 GB RAM, 1.5 GHz CPU)
 | **Framework**       | **Model**    | **Task Type** | **FPS** | **Average inference time, ms** |
@@ -32,7 +39,26 @@
 В MVP используется NCNN как демонстрирующий наибольшую производительность на ARM.
 
 ## Использование
-Docker: In progress
+### Требования
+* Linux:
+1. Docker Engine
+2. Git
+
+### Инструкция
+1. Clone repository
+```
+git clone https://github.com/asesorov/EnhancedPedestrianDetection.git
+```
+2. Build Docker image
+```
+docker build --pull --rm -f "EnhancedPedestrianDetection/Dockerfile" -t epd:latest "EnhancedPedestrianDetection"
+```
+3. Run container
+```
+docker run --rm -d -p 8501:8501/tcp epd:latest
+```
+4. Open URL: http://localhost:8501
+
 
 ## Структура репозитория
 - `src` - исходники проекта;
@@ -52,6 +78,7 @@ Docker: In progress
             - `task type` - segmentation/detection - тип модели;
                 - `framework` - модель, сконвертированная в `framework`. Основной фреймворк для инференса: NCNN. Основной фреймворк для тренировки и экспериментов: PyTorch.
     - `utils` - различные инструменты;
+    - `train` - включает скрипт для тренировки моделей YOLO с логированием в MLflow и пример конфигурации запуска;
 - `docs` - документация и справочная информация по проекту;
 - `augment_data.py` - скрипт для автоматизации препроцессинга в DVC;
 - `requirements.txt` - необходимые для работы приложения Python-библиотеки;
@@ -69,11 +96,8 @@ Docker: In progress
 [Расчет стоимости](https://github.com/asesorov/EnhancedPedestrianDetection/blob/main/docs/Расчет%20стоимости.md)
 
 ## Примеры
-### Детекция на различных расстояниях
-![Far validation](./samples/val_batch1_pred.jpg)
-
-### Сегментация в реальных условиях
-![Far validation](./samples/road_segment.jpeg)
+### UI
+![UI Sample](./samples/UI_sample.png)
 
 ### Кривая Precision-Recall:
 ![PR-Curve](./samples/PR_curve.png)
