@@ -49,13 +49,13 @@
 ```
 git clone https://github.com/asesorov/EnhancedPedestrianDetection.git
 ```
-2. Build Docker image
+2. Build the image
 ```
-docker build --pull --rm -f "EnhancedPedestrianDetection/Dockerfile" -t epd:latest "EnhancedPedestrianDetection"
+docker-compose build
 ```
 3. Run container
 ```
-docker run --rm -d -p 8501:8501/tcp epd:latest
+docker-compose up
 ```
 4. Open URL: http://localhost:8501
 
