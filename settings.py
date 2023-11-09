@@ -22,22 +22,5 @@ YOUTUBE = 'YouTube'
 
 SOURCES_LIST = [VIDEO, WEBCAM, RTSP, YOUTUBE]
 
-# Images config
-IMAGES_DIR = ROOT / 'images'
-DEFAULT_IMAGE = IMAGES_DIR / 'office_4.jpg'
-DEFAULT_DETECT_IMAGE = IMAGES_DIR / 'office_4_detected.jpg'
-
-# Videos config
-VIDEO_DIR = ROOT / 'videos'
-VIDEO_2_PATH = VIDEO_DIR / 'video.avi'
-VIDEOS_DICT = {
-    'video_2': VIDEO_2_PATH
-}
-
-# ML Model config
-MODEL_DIR = ROOT / 'weights'
-DETECTION_MODEL = MODEL_DIR / 'best_detection.pt'
-SEGMENTATION_MODEL = MODEL_DIR / 'best_segmentation.pt'
-
 # Webcam
 WEBCAM_PATH = 0

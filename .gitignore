@@ -189,3 +189,4 @@ cython_debug/
 /.idea/misc.xml
 /videos/video
 weights
+images
