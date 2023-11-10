@@ -26,11 +26,11 @@ st.sidebar.header("ML Model Config")
 # Model Options
 detection = st.sidebar.checkbox(label="Detection")
 segmentation = st.sidebar.checkbox(label="Segmentation")
-include_logic = False
+# include_logic = False
 plot_segmentation = True
 
 if detection and segmentation:
-    include_logic = st.sidebar.checkbox(label="Include logic")
+    # include_logic = st.sidebar.checkbox(label="Include logic")
     plot_segmentation = st.sidebar.checkbox(label="Plot segmentation")
 
 
@@ -56,5 +56,4 @@ else:
     st.error("Please select a valid source type!")
 
 if helper_func:
-    helper_func(detection=detection, segmentation=segmentation, plot_segmentation=plot_segmentation,
-                include_logic=include_logic)
+    helper_func(detection=detection, segmentation=segmentation, plot_segmentation=plot_segmentation)
