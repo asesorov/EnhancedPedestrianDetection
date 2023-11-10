@@ -26,7 +26,7 @@ def load_model(model_path):
 
 
 def _display_detected_frames(st_frame, image, detection=False, segmentation=False,
-                             plot_segmentation=True, include_logic=False):
+                             plot_segmentation=True):
     """
     Display the detected objects on a video frame using the YOLOv8 model.
 
@@ -57,16 +57,17 @@ def _display_detected_frames(st_frame, image, detection=False, segmentation=Fals
     else:
         segmentation_mask = np.zeros([*image.shape[:2], 1])
 
-    if include_logic:
-        new_boxes = []
-        for box in boxes:
-            if not if_person_on_road(box, segmentation_mask):
-                continue
-            new_boxes.append(box)
-        boxes = new_boxes
+    boxes_on_road = []
+    boxes_out_of_road = []
+    for box in boxes:
+        if not if_person_on_road(box, segmentation_mask):
+            boxes_out_of_road.append(box)
+            continue
+        boxes_on_road.append(box)
 
     # # Plot the detected objects on the video frame
-    res_plotted = plot_detect_segment(image, boxes, segmentation_mask)
+    res_plotted = plot_detect_segment(image, boxes_out_of_road, segmentation_mask)
+    res_plotted = plot_detect_segment(res_plotted, boxes_on_road, box_color=(0, 0, 255))
     st_frame.image(res_plotted,
                    caption='Detected Video',
                    channels="BGR",
@@ -253,11 +254,11 @@ def draw_mask(image, mask_generated):
     return cv2.addWeighted(image, 0.7, masked_image, 0.3, 0)
 
 
-def plot_detect_segment(image, bboxs_xyxy=[], segment_mask=None):
+def plot_detect_segment(image, bboxs_xyxy=[], segment_mask=None, box_color=(0, 255, 0)):
     res_image = image.copy()
 
     for bbox in bboxs_xyxy:
-        cv2.rectangle(res_image, (bbox[0], bbox[1]), (bbox[2], bbox[3]), (0, 255, 0), 1)
+        cv2.rectangle(res_image, (bbox[0], bbox[1]), (bbox[2], bbox[3]), box_color, 1)
 
     if segment_mask is None:
         return res_image
